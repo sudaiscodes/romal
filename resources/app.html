@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Romal invoicing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="/css/app.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Arimo:wght@700&family=Roboto+Condensed:wght@700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-plus" viewBox="0 0 16 16">
+            <path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-filter" viewBox="0 0 16 16">
+            <path d="M2 3h12l-4.6 5.6v4.6l-2.8 1.3V8.6z" fill="none" stroke="currentColor" stroke-width="1.4"
+                stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-eye" viewBox="0 0 16 16">
+            <path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z" fill="none"
+                stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
+            <circle cx="8" cy="8" r="2" fill="none" stroke="currentColor" stroke-width="1.4" />
+        </symbol>
+        <symbol id="i-search" viewBox="0 0 16 16">
+            <circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5" />
+            <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-x" viewBox="0 0 16 16">
+            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 16 16">
+            <path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-reset" viewBox="0 0 16 16">
+            <path d="M2.8 8a5.2 5.2 0 1 0 1.5-3.7M2.8 2.6v2.9h2.9" fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-invoice" viewBox="0 0 16 16">
+            <path d="M4 1.5h5.5l3 3v10H4z M9.5 1.5v3h3 M6.3 8h4 M6.3 10.7h4" fill="none" stroke="currentColor"
+                stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-book" viewBox="0 0 16 16">
+            <path d="M3 12.5V3.2c0-.4.3-.7.7-.7H13v9H4.5A1.5 1.5 0 0 0 3 13a1.5 1.5 0 0 0 1.5 1.5H13 M6 5.5h4"
+                fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-cash" viewBox="0 0 16 16">
+            <rect x="1.5" y="4" width="13" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4" />
+            <circle cx="8" cy="8" r="1.8" fill="none" stroke="currentColor" stroke-width="1.4" />
+        </symbol>
+        <symbol id="i-users" viewBox="0 0 16 16">
+            <circle cx="6" cy="5.5" r="2.3" fill="none" stroke="currentColor" stroke-width="1.4" />
+            <path
+                d="M1.8 13.5c.5-2.3 2.2-3.5 4.2-3.5s3.7 1.2 4.2 3.5 M11 3.6a2 2 0 0 1 0 4 M11.6 10.1c1.5.3 2.4 1.4 2.7 3.1"
+                fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-tag" viewBox="0 0 16 16">
+            <path d="M1.8 8.4V2.2h6.2l6.2 6.2-5.9 5.9z" fill="none" stroke="currentColor" stroke-width="1.4"
+                stroke-linejoin="round" />
+            <circle cx="5" cy="5.2" r="1" fill="currentColor" />
+        </symbol>
+        <symbol id="i-cal" viewBox="0 0 16 16">
+            <rect x="1.5" y="3" width="13" height="11.5" rx="1.5" fill="none" stroke="currentColor"
+                stroke-width="1.4" />
+            <path d="M1.5 6.5h13M5 1.5v3M11 1.5v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+        </symbol>
+        <symbol id="i-edit" viewBox="0 0 16 16">
+            <path d="M11.2 2.3l2.5 2.5-8.4 8.4-3.1.6.6-3.1 8.4-8.4z" fill="none" stroke="currentColor"
+                stroke-width="1.4" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-trash" viewBox="0 0 16 16">
+            <path d="M2.5 4h11M6.2 4V2.5h3.6V4M4 4l.7 9.5h6.6L12 4M6.6 6.5v4.5M9.4 6.5v4.5" fill="none"
+                stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+        <symbol id="i-sort" viewBox="0 0 16 16">
+            <path d="M5 2v12M5 14l-3-3M5 14l3-3M11 14V2M11 2L8 5M11 2l3 3" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </symbol>
+    </svg>
+    <div class="app">
+        <div class="nav">
+            <h1>Barkat Siddique</h1>
+            <div class="item active" data-view="ledger"><svg class="ico" aria-hidden="true">
+                    <use href="#i-book" />
+                </svg><span>Ledger</span></div>
+            <div class="item" data-view="invoices"><svg class="ico" aria-hidden="true">
+                    <use href="#i-invoice" />
+                </svg><span>Bills</span></div>
+            <div class="item" data-view="payments"><svg class="ico" aria-hidden="true">
+                    <use href="#i-cash" />
+                </svg><span>Payments</span></div>
+            <div class="item" data-view="parties"><svg class="ico" aria-hidden="true">
+                    <use href="#i-users" />
+                </svg><span>Parties</span></div>
+            <div class="item" data-view="varieties"><svg class="ico" aria-hidden="true">
+                    <use href="#i-tag" />
+                </svg><span>Varieties</span></div>
+            <div class="profile" id="profile">
+                <button type="button" class="item profile-btn" id="profileBtn" onclick="toggleProfile()"
+                    aria-expanded="false" aria-controls="profileCard"><span class="avatar"
+                        id="profileAvatar">?</span><span class="profile-meta"><span class="profile-name"
+                            id="profileName">Profile</span><span class="profile-email"
+                            id="profileEmail"></span></span></button>
+                <div class="profile-card" id="profileCard" role="dialog" aria-label="Logged in user">
+                    <div class="pc-head"><span class="avatar lg" id="profileCardAvatar">?</span>
+                        <div class="pc-info">
+                            <div class="pc-label">Logged in as</div>
+                            <div class="pc-name-row"><span class="pc-name" id="profileCardName"></span><button
+                                    type="button" class="pc-edit" onclick="editProfileName(true)" title="Edit name"
+                                    aria-label="Edit name"><svg aria-hidden="true">
+                                        <use href="#i-edit" />
+                                    </svg></button></div>
+                            <div class="pc-email" id="profileCardEmail"></div>
+                        </div>
+                    </div>
+                    <form class="pc-name-form" id="profileNameForm" onsubmit="saveProfileName(event)">
+                        <label for="profileNameInput">Your name</label>
+                        <input type="text" id="profileNameInput" maxlength="255" autocomplete="name" required>
+                        <div class="err" id="profileNameErr"></div>
+                        <div class="pc-form-actions">
+                            <button type="button" class="btn ghost sm" onclick="editProfileName(false)">Cancel</button>
+                            <button type="submit" class="btn sm" id="profileNameSave">Save</button>
+                        </div>
+                    </form>
+                    <button type="button" class="pc-logout" onclick="logout()">Log out</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main urdu" dir="rtl" lang="ur">
+            <!-- INVOICES -->
+            <div id="view-invoices" style="display:none">
+                <div class="top">
+                    <div>
+                        <h2>Invoice</h2>
+                    </div>
+                </div>
+
+                <div class="cta" id="ctaBar">
+                    <button class="btn lg" onclick="openForm()"><svg class="ico" aria-hidden="true">
+                            <use href="#i-plus" />
+                        </svg>New invoice</button>
+                    <div class="meta">Next invoice number: <b id="ctaNextNo">001</b></div>
+                </div>
+
+                <div class="success" id="successPanel" role="status" aria-live="polite">
+                    <div class="tick">&#10003;</div>
+                    <h3 id="successTitle">Invoice generated</h3>
+                    <p id="successText"></p>
+                    <div class="actions">
+                        <button class="btn" id="successView"><svg class="ico" aria-hidden="true">
+                                <use href="#i-eye" />
+                            </svg>View invoice</button>
+                        <button class="btn ghost" onclick="openForm()"><svg class="ico" aria-hidden="true">
+                                <use href="#i-plus" />
+                            </svg>Create another invoice</button>
+                        <button class="btn ghost" onclick="closeSuccess()">Done</button>
+                    </div>
+                </div>
+
+                <div class="panel" id="formPanel" style="display:none">
+                    <div class="panel-head">
+                        <h3>New invoice</h3>
+                    </div>
+                    <div class="bill-sheet">
+                        <div class="bill-paper bill-form">
+                            <div id="fBrand"></div>
+                            <div class="bp-meta">
+                                <div class="bm-cell bm-no"><span class="bm-lbl">نمبر</span><span class="bm-val bm-num"
+                                        id="fNoBadge" dir="ltr">001</span></div>
+                                <div class="bm-cell bm-side"><span class="bm-lbl"><label
+                                            for="fDate">تاریخ</label></span>
+                                    <div class="bm-val bm-input">
+                                        <div class="date-field"><input type="text" class="dtext" id="fDate"
+                                                placeholder="dd/mm/yyyy" inputmode="numeric" maxlength="10"
+                                                autocomplete="off"><svg class="cal">
+                                                <use href="#i-cal" />
+                                            </svg><input type="date" class="dnative" tabindex="-1"
+                                                aria-label="Open calendar"></div>
+                                    </div>
+                                </div>
+                                <div class="bm-cell bm-name"><span class="bm-lbl"><label for="fParty">بل
+                                            بنام</label></span>
+                                    <div class="bm-val bm-input"><select id="fParty" required
+                                            onchange="onPartyChange()"></select></div>
+                                </div>
+                                <div class="bm-cell bm-side"><span class="bm-lbl"><label for="fShip">بلٹی
+                                            نمبر</label></span>
+                                    <div class="bm-val bm-input"><input type="text" id="fShip" dir="ltr"
+                                            autocomplete="off"></div>
+                                </div>
+                            </div>
+                            <div id="newPartyBox" class="bf-newparty" style="display:none">
+                                <label for="fNewParty">نئی پارٹی کا نام</label>
+                                <input type="text" id="fNewParty" placeholder="e.g. Imran General Store">
+                            </div>
+                            <div class="tbl-wrap">
+                                <table class="bp-tbl bf-tbl">
+                                    <thead>
+                                        <tr>
+                                            <th class="b-sn">نمبر</th>
+                                            <th class="b-desc">تفصیل</th>
+                                            <th class="b-qty">تعداد</th>
+                                            <th class="b-rate">ریٹ</th>
+                                            <th class="b-amt">کل رقم</th>
+                                            <th class="act"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="fItems"></tbody>
+                                    <tbody id="fFill"></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td class="b-sign" colspan="3"><label for="fSign">دستخط</label><select
+                                                    id="fSign" class="bf-sign" aria-label="دستخط">
+                                                    <option value="" disabled selected hidden></option>
+                                                    <option value="حاجی فیصل">حاجی فیصل</option>
+                                                    <option value="حاجی قیصر">حاجی قیصر</option>
+                                                </select></td>
+                                            <td class="b-total-lbl">میزان</td>
+                                            <td class="b-amt b-total"><span dir="ltr"><b id="fTotal">0</b></span></td>
+                                            <td class="act"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="err" id="formErr"></div>
+                    <div class="form-actions">
+                        <button class="btn ghost" onclick="cancelForm()"><svg class="ico" aria-hidden="true">
+                                <use href="#i-x" />
+                            </svg>Cancel</button>
+                        <button class="btn ghost" onclick="resetForm()"><svg class="ico" aria-hidden="true">
+                                <use href="#i-reset" />
+                            </svg>Clear</button>
+                        <button class="btn" onclick="saveInvoice()"><svg class="ico" aria-hidden="true">
+                                <use href="#i-check" />
+                            </svg>Generate invoice</button>
+                    </div>
+                </div>
+
+                <div class="top">
+                    <div>
+                        <h2>Recent invoices</h2>
+                    </div>
+                    <button class="btn ghost filter-btn" id="filterBtn" onclick="toggleFilters()" aria-expanded="false"
+                        aria-controls="filterPanel"><svg class="ico" aria-hidden="true">
+                            <use href="#i-filter" />
+                        </svg>Filters<span class="badge" id="filterCount"></span></button>
+                </div>
+                <div class="panel filter-card hide" id="filterPanel">
+                    <div class="filter-card-head"><span>Filter invoices</span><button class="btn ghost sm"
+                            onclick="clearFilters()"><svg class="ico" aria-hidden="true">
+                                <use href="#i-reset" />
+                            </svg>Clear all</button></div>
+                    <div class="filters">
+                        <div><label for="ffFrom">From date</label>
+                            <div class="date-field"><input type="text" class="dtext" id="ffFrom"
+                                    placeholder="dd/mm/yyyy" inputmode="numeric" maxlength="10" autocomplete="off"><svg
+                                    class="cal">
+                                    <use href="#i-cal" />
+                                </svg><input type="date" class="dnative" tabindex="-1" aria-label="Open calendar"></div>
+                        </div>
+                        <div><label for="ffTo">To date</label>
+                            <div class="date-field"><input type="text" class="dtext" id="ffTo" placeholder="dd/mm/yyyy"
+                                    inputmode="numeric" maxlength="10" autocomplete="off"><svg class="cal">
+                                    <use href="#i-cal" />
+                                </svg><input type="date" class="dnative" tabindex="-1" aria-label="Open calendar"></div>
+                        </div>
+                        <div><label for="ffParty">Party</label><select id="ffParty"
+                                onchange="onSearch('invoices')"></select></div>
+                        <div><label for="ffCat">Category</label><select id="ffCat" onchange="onSearch('invoices')">
+                                <option value="">All categories</option>
+                                <option value="Romal">Romal</option>
+                                <option value="Shawl">Shawl</option>
+                                <option value="Lungi">Lungi</option>
+                            </select></div>
+                        <div><label for="ffVariety">Variety</label><select id="ffVariety"
+                                onchange="onSearch('invoices')"></select></div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="chips" id="filterChips"></div>
+                    <div class="filter-info" id="filterInfo"></div>
+                    <div class="tbl-wrap">
+                        <table class="compact">
+                            <thead>
+                                <tr>
+                                    <th class="rn">#</th>
+                                    <th>Inv #</th>
+                                    <th>Date</th>
+                                    <th>Party</th>
+                                    <th>Shipping #</th>
+                                    <th class="num">Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoiceRows"></tbody>
+                        </table>
+                    </div>
+                    <div class="pager" id="pager-invoices"></div>
+                </div>
+            </div>
+
+            <!-- LEDGER -->
+            <div id="view-ledger">
+                <div class="top">
+                    <div>
+                        <h2>Ledger</h2>
+                        <p>Running balance per shopkeeper.</p>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="picker">
+                        <select id="ledgerPartySel" required aria-label="Select party"></select>
+                        <button class="btn" onclick="openLedger()"><svg class="ico" aria-hidden="true">
+                                <use href="#i-book" />
+                            </svg>Open ledger</button>
+                    </div>
+                    <div class="err" id="pickErr">Select a party first.</div>
+                </div>
+
+                <div id="ledgerPanel" style="display:none">
+                    <div class="lg-card lg-head">
+                        <div>
+                            <h3 id="selName"></h3>
+                            <div class="lg-sub" id="selSub"></div>
+                        </div>
+                        <button class="btn" id="addPayBtn" onclick="togglePayBox()"><svg class="ico" aria-hidden="true">
+                                <use href="#i-plus" />
+                            </svg>Add payment</button>
+                    </div>
+
+                    <div class="lg-summary">
+                        <div class="cell"><span class="k">Total invoiced</span><span class="v" id="sumInv">0</span>
+                        </div>
+                        <div class="cell"><span class="k">Total received</span><span class="v pay" id="sumPay">0</span>
+                        </div>
+                        <div class="cell due"><span class="k" id="sumBalLabel">Balance due</span><span class="v"
+                                id="sumBal">0</span></div>
+                    </div>
+
+                    <div class="ok-msg" id="ledgerOk"></div>
+                    <div class="pay-box" id="payBox">
+                        <h4>Add payment</h4>
+                        <div class="pay-form">
+                            <div><label for="payDate">Payment date</label>
+                                <div class="date-field"><input type="text" class="dtext" id="payDate"
+                                        placeholder="dd/mm/yyyy" inputmode="numeric" maxlength="10"
+                                        autocomplete="off"><svg class="cal">
+                                        <use href="#i-cal" />
+                                    </svg><input type="date" class="dnative" tabindex="-1" aria-label="Open calendar">
+                                </div>
+                            </div>
+                            <div><label for="payMethod">Payment type</label><select id="payMethod">
+                                    <option value="Cash">Cash</option>
+                                    <option value="Online">Online</option>
+                                    <option value="Cheque">Cheque</option>
+                                </select></div>
+                            <div><label for="payAmt">Amount received</label><input type="text" inputmode="numeric"
+                                    autocomplete="off" class="int" id="payAmt" placeholder="e.g. 5000"></div>
+                            <div class="pay-actions">
+                                <button class="btn ghost" onclick="togglePayBox(false)"><svg class="ico"
+                                        aria-hidden="true">
+                                        <use href="#i-x" />
+                                    </svg>Cancel</button>
+                                <button class="btn" onclick="addPayment()"><svg class="ico" aria-hidden="true">
+                                        <use href="#i-check" />
+                                    </svg>Record payment</button>
+                            </div>
+                        </div>
+                        <div class="err" id="payErr" style="padding:8px 0 0">Enter a valid payment date (dd/mm/yyyy) and
+                            amount.</div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="entries-head">
+                            <h3>Entries <span class="count" id="entryCount"></span></h3>
+                            <button class="icon-btn order-btn" id="orderBtn" onclick="toggleOrder()" title="ترتیب الٹیں"
+                                aria-label="ترتیب الٹیں"><svg>
+                                    <use href="#i-sort" />
+                                </svg><span id="orderLabel" class="sr-only">Oldest first</span></button>
+                        </div>
+                        <div class="tbl-wrap">
+                            <table class="ledger-tbl">
+                                <thead>
+                                    <tr>
+                                        <th class="rn">#</th>
+                                        <th class="c-date">Date</th>
+                                        <th class="c-type">Type</th>
+                                        <th>Details</th>
+                                        <th class="num">Invoice</th>
+                                        <th class="num">Payment</th>
+                                        <th class="num c-bal">Balance</th>
+                                        <th class="act"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ledgerRows"></tbody>
+                                <tfoot id="ledgerFoot"></tfoot>
+                            </table>
+                        </div>
+                        <div class="empty" id="ledgerEmpty" style="display:none">No entries yet for this party.</div>
+                        <div class="pager" id="pager-ledger"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAYMENTS -->
+            <div id="view-payments" style="display:none">
+                <div class="top">
+                    <div>
+                        <h2>Payments</h2>
+                        <p>Money received from parties. Each payment posts to that party's ledger.</p>
+                    </div>
+                </div>
+                <div class="cta" id="payCta">
+                    <button class="btn lg" onclick="openFlowForm('pay')"><svg class="ico" aria-hidden="true">
+                            <use href="#i-plus" />
+                        </svg>Record payment</button>
+                </div>
+
+                <div class="success" id="paySuccess" role="status" aria-live="polite">
+                    <div class="tick">&#10003;</div>
+                    <h3>Payment recorded</h3>
+                    <p id="paySuccessText"></p>
+                    <div class="actions">
+                        <button class="btn" onclick="openFlowForm('pay')"><svg class="ico" aria-hidden="true">
+                                <use href="#i-plus" />
+                            </svg>Record another payment</button>
+                        <button class="btn ghost" onclick="showFlow('pay', 'cta')">Done</button>
+                    </div>
+                </div>
+
+                <div class="panel" id="payPanel" style="display:none">
+                    <div class="panel-head">
+                        <h3>Record a payment</h3>
+                    </div>
+                    <div class="pay-top">
+                        <div><label for="pDate">Date</label>
+                            <div class="date-field"><input type="text" class="dtext" id="pDate" placeholder="dd/mm/yyyy"
+                                    inputmode="numeric" maxlength="10" autocomplete="off"><svg class="cal">
+                                    <use href="#i-cal" />
+                                </svg><input type="date" class="dnative" tabindex="-1" aria-label="Open calendar"></div>
+                        </div>
+                        <div><label for="pParty">Party</label><select id="pParty" required></select></div>
+                        <div><label for="pMethod">Payment type</label><select id="pMethod">
+                                <option value="Cash">Cash</option>
+                                <option value="Online">Online</option>
+                                <option value="Cheque">Cheque</option>
+                            </select></div>
+                        <div><label for="pAmt">Amount</label><input type="text" inputmode="numeric" autocomplete="off"
+                                class="int" id="pAmt" placeholder="e.g. 5000">
+                        </div>
+                    </div>
+                    <div class="err" id="pErr">Fill in a valid date (dd/mm/yyyy), party, payment type and amount.</div>
+                    <div class="form-actions">
+                        <button class="btn ghost" onclick="showFlow('pay', 'cta')"><svg class="ico" aria-hidden="true">
+                                <use href="#i-x" />
+                            </svg>Cancel</button>
+                        <button class="btn" onclick="recordPaymentTab()"><svg class="ico" aria-hidden="true">
+                                <use href="#i-check" />
+                            </svg>Record payment</button>
+                    </div>
+                </div>
+
+                <div class="top">
+                    <div>
+                        <h2>All payments</h2>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head"><label class="search"><svg class="ico" aria-hidden="true">
+                                <use href="#i-search" />
+                            </svg><input type="text" id="paySearch" placeholder="Search by party"
+                                oninput="onSearch('payments')" aria-label="Search by party"></label></div>
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="rn">#</th>
+                                    <th>Date</th>
+                                    <th>Party</th>
+                                    <th>Payment type</th>
+                                    <th class="num">Amount</th>
+                                    <th class="act"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentRows"></tbody>
+                        </table>
+                    </div>
+                    <div class="pager" id="pager-payments"></div>
+                </div>
+            </div>
+
+            <!-- PARTIES -->
+            <div id="view-parties" class="urdu" dir="rtl" lang="ur" style="display:none">
+                <div class="top">
+                    <div>
+                        <h2>پارٹیاں</h2>
+                        <p>وہ دکاندار جنہیں آپ مال بھیجتے ہیں۔ کھاتہ کھولنے کے لیے نام پر کلک کریں۔</p>
+                    </div>
+                </div>
+                <div class="cta" id="partyCta">
+                    <button class="btn lg" onclick="openFlowForm('party')"><svg class="ico" aria-hidden="true">
+                            <use href="#i-plus" />
+                        </svg>نئی پارٹی شامل کریں</button>
+                </div>
+
+                <div class="success" id="partySuccess" role="status" aria-live="polite">
+                    <div class="tick">&#10003;</div>
+                    <h3>پارٹی شامل ہو گئی</h3>
+                    <p id="partySuccessText"></p>
+                    <div class="actions">
+                        <button class="btn" onclick="openFlowForm('party')"><svg class="ico" aria-hidden="true">
+                                <use href="#i-plus" />
+                            </svg>ایک اور پارٹی شامل کریں</button>
+                        <button class="btn ghost" onclick="showFlow('party', 'cta')">ٹھیک ہے</button>
+                    </div>
+                </div>
+
+                <div class="panel" id="partyPanel" style="display:none">
+                    <div class="panel-head">
+                        <h3>نئی پارٹی شامل کریں</h3>
+                    </div>
+                    <div class="form-grid">
+                        <div class="full"><label for="newPartyName">پارٹی کا نام</label><input type="text"
+                                id="newPartyName" placeholder="مثلاً عمران جنرل اسٹور"
+                                onkeydown="if(event.key==='Enter')addPartyStandalone()"></div>
+                    </div>
+                    <div class="err" id="partyDupErr"></div>
+                    <div class="form-actions">
+                        <button class="btn ghost" onclick="showFlow('party', 'cta')"><svg class="ico"
+                                aria-hidden="true">
+                                <use href="#i-x" />
+                            </svg>منسوخ کریں</button>
+                        <button class="btn" onclick="addPartyStandalone()"><svg class="ico" aria-hidden="true">
+                                <use href="#i-check" />
+                            </svg>شامل کریں</button>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head"><label class="search"><svg class="ico" aria-hidden="true">
+                                <use href="#i-search" />
+                            </svg><input type="text" id="partySearch" placeholder="پارٹی تلاش کریں"
+                                oninput="onSearch('parties')" aria-label="پارٹی تلاش کریں"></label></div>
+                    <div class="tbl-wrap">
+                        <table class="list-tbl">
+                            <thead>
+                                <tr>
+                                    <th class="rn">#</th>
+                                    <th>پارٹی کا نام</th>
+                                    <th class="num">بیلنس</th>
+                                    <th class="act"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="partiesListRows"></tbody>
+                        </table>
+                    </div>
+                    <div class="pager" id="pager-parties"></div>
+                </div>
+            </div>
+
+            <!-- VARIETIES -->
+            <div id="view-varieties" class="urdu" dir="rtl" lang="ur" style="display:none">
+                <div class="top">
+                    <div>
+                        <h2>ورائٹیز</h2>
+                        <p>رومال درجن میں، شال پیس میں اور لنگی چوکڑے (4 پیس) میں فروخت ہوتی ہے۔</p>
+                    </div>
+                </div>
+                <div class="cta" id="varietyCta">
+                    <button class="btn lg" onclick="openFlowForm('variety')"><svg class="ico" aria-hidden="true">
+                            <use href="#i-plus" />
+                        </svg>نئی ورائٹی شامل کریں</button>
+                </div>
+
+                <div class="success" id="varietySuccess" role="status" aria-live="polite">
+                    <div class="tick">&#10003;</div>
+                    <h3>ورائٹی شامل ہو گئی</h3>
+                    <p id="varietySuccessText"></p>
+                    <div class="actions">
+                        <button class="btn" onclick="openFlowForm('variety')"><svg class="ico" aria-hidden="true">
+                                <use href="#i-plus" />
+                            </svg>ایک اور ورائٹی شامل کریں</button>
+                        <button class="btn ghost" onclick="showFlow('variety', 'cta')">ٹھیک ہے</button>
+                    </div>
+                </div>
+
+                <div class="panel" id="varietyPanel" style="display:none">
+                    <div class="panel-head">
+                        <h3>نئی ورائٹی شامل کریں</h3>
+                    </div>
+                    <div class="form-grid">
+                        <div><label for="newVarietyName">ورائٹی کا نام</label><input type="text" id="newVarietyName"
+                                placeholder="ورائٹی کا نام"
+                                onkeydown="if(event.key==='Enter')addVarietyStandalone()"></div>
+                        <div><label for="newVarietyCat">کوالٹی</label><select id="newVarietyCat">
+                                <option value="Romal">رومال (درجن)</option>
+                                <option value="Shawl">شال (پیس)</option>
+                                <option value="Lungi">لنگی (چوکڑہ)</option>
+                            </select></div>
+                    </div>
+                    <div class="err" id="varietyDupErr"></div>
+                    <div class="form-actions">
+                        <button class="btn ghost" onclick="showFlow('variety', 'cta')"><svg class="ico"
+                                aria-hidden="true">
+                                <use href="#i-x" />
+                            </svg>منسوخ کریں</button>
+                        <button class="btn" onclick="addVarietyStandalone()"><svg class="ico" aria-hidden="true">
+                                <use href="#i-check" />
+                            </svg>شامل کریں</button>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head">
+                        <label class="search"><svg class="ico" aria-hidden="true">
+                                <use href="#i-search" />
+                            </svg><input type="text" id="varietySearch" placeholder="ورائٹی تلاش کریں"
+                                oninput="onSearch('varieties')" aria-label="ورائٹی تلاش کریں"></label>
+                        <select id="varietyCatFilter" onchange="onSearch('varieties')" aria-label="کوالٹی کے لحاظ سے">
+                            <option value="">تمام کوالٹیز</option>
+                            <option value="Romal">رومال</option>
+                            <option value="Shawl">شال</option>
+                            <option value="Lungi">لنگی</option>
+                        </select>
+                    </div>
+                    <div class="tbl-wrap">
+                        <table class="list-tbl">
+                            <thead>
+                                <tr>
+                                    <th class="rn">#</th>
+                                    <th>ورائٹی کا نام</th>
+                                    <th>کوالٹی</th>
+                                    <th>پیس / سیٹ</th>
+                                    <th class="act"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="varietiesListRows"></tbody>
+                        </table>
+                    </div>
+                    <div class="pager" id="pager-varieties"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="editBg" onclick="if(event.target===this)closeEdit()">
+        <div class="modal edit urdu" dir="rtl" lang="ur" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+            <h2 id="editTitle">Edit</h2>
+            <div class="sub" id="editSub"></div>
+            <div class="form-grid" id="editInvoice">
+                <div><label for="eiDate">Date</label>
+                    <div class="date-field"><input type="text" class="dtext" id="eiDate" placeholder="dd/mm/yyyy"
+                            inputmode="numeric" maxlength="10" autocomplete="off"><svg class="cal">
+                            <use href="#i-cal" />
+                        </svg><input type="date" class="dnative" tabindex="-1" aria-label="Open calendar"></div>
+                </div>
+                <div><label for="eiShip">Shipping number</label><input type="text" id="eiShip" dir="ltr"></div>
+                <div class="full"><label for="eiParty">Party</label><select id="eiParty" required></select></div>
+                <div class="full bill-box">
+                    <div class="tbl-wrap">
+                        <table class="items-tbl bill-tbl">
+                            <thead>
+                                <tr>
+                                    <th class="rn">#</th>
+                                    <th>کوالٹی</th>
+                                    <th class="c-qty">تعداد</th>
+                                    <th class="c-rate">ریٹ</th>
+                                    <th class="num">کل رقم</th>
+                                    <th class="act"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="eiItems"></tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="add-cell"><button type="button" class="btn ghost sm"
+                                            onclick="addItemRow('eiItems')"><svg class="ico" aria-hidden="true">
+                                                <use href="#i-plus" />
+                                            </svg>آئٹم شامل کریں</button></td>
+                                    <td class="tot-lbl">کل رقم</td>
+                                    <td colspan="2" class="tot-val"><span dir="ltr"><b id="eiTotal">0</b></span></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="form-grid" id="editPayment">
+                <div><label for="epDate">Date</label>
+                    <div class="date-field"><input type="text" class="dtext" id="epDate" placeholder="dd/mm/yyyy"
+                            inputmode="numeric" maxlength="10" autocomplete="off"><svg class="cal">
+                            <use href="#i-cal" />
+                        </svg><input type="date" class="dnative" tabindex="-1" aria-label="Open calendar"></div>
+                </div>
+                <div><label for="epMethod">Payment type</label><select id="epMethod">
+                        <option value="Cash">Cash</option>
+                        <option value="Online">Online</option>
+                        <option value="Cheque">Cheque</option>
+                    </select></div>
+                <div class="full"><label for="epParty">Party</label><select id="epParty" required></select></div>
+                <div class="full"><label for="epAmt">Amount</label><input type="text" inputmode="numeric"
+                        autocomplete="off" class="int" id="epAmt"></div>
+            </div>
+            <div class="form-grid" id="editName">
+                <div class="full"><label for="enName" id="enLabel">نام</label><input type="text" id="enName"></div>
+                <div class="full" id="enCatBox"><label for="enCat">کوالٹی</label><select id="enCat">
+                        <option value="Romal">رومال (درجن)</option>
+                        <option value="Shawl">شال (پیس)</option>
+                        <option value="Lungi">لنگی (چوکڑہ)</option>
+                    </select></div>
+            </div>
+            <div class="err" id="editErr"></div>
+            <div class="modal-actions">
+                <button class="btn ghost" onclick="closeEdit()"><svg class="ico" aria-hidden="true">
+                        <use href="#i-x" />
+                    </svg><span id="editCancelTxt">Cancel</span></button>
+                <button class="btn" id="editSaveBtn" onclick="saveEdit()">Save changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="confirmBg" onclick="if(event.target===this)closeConfirm()">
+        <div class="modal confirm urdu" dir="rtl" lang="ur" role="alertdialog" aria-modal="true"
+            aria-labelledby="confirmTitle" aria-describedby="confirmText">
+            <h2 id="confirmTitle"></h2>
+            <div class="sub" id="confirmText"></div>
+            <div class="err" id="confirmErr"></div>
+            <div class="modal-actions">
+                <button class="btn ghost" id="confirmCancel" onclick="closeConfirm()"><svg class="ico"
+                        aria-hidden="true">
+                        <use href="#i-x" />
+                    </svg><span id="confirmCancelTxt">منسوخ کریں</span></button>
+                <button class="btn danger" id="confirmYes" onclick="runConfirm()"><svg class="ico" aria-hidden="true">
+                        <use href="#i-trash" />
+                    </svg><span id="confirmYesTxt">ہاں، حذف کریں</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="previewBg" onclick="if(event.target===this)closePreview()">
+        <div class="modal urdu" dir="rtl" lang="ur" id="previewBody"></div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+
+</html>

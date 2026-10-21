@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($f = 'public\\\\js\\\\app.js'; $lines = [IO.File]::ReadAllLines\\(\\(Resolve-Path $f\\), [Text.UTF8Encoding]::new\\($false\\)\\); $lines[85]; $lines[88]; $head = @\\(\"const STR = { paidCash: 'Cash', paidOnline: 'Online', paidCheque: 'Cheque', closeBtn: 'Close', noInvoices: 'No invoices yet.' };\", \"function t\\(key\\) { return STR[key] || key; }\", \"\"\\); $out = $head + $lines[85..87] + $lines[89..\\($lines.Length-1\\)]; [IO.File]::WriteAllLines\\(\\(Resolve-Path $f\\), $out, [Text.UTF8Encoding]::new\\($false\\)\\); \\(Get-Content $f -TotalCount 8 -Encoding UTF8\\))",
+      "PowerShell(php artisan migrate --no-interaction 2>&1)",
+      "PowerShell(vendor/bin/pint --format agent app/Http/Controllers/ApiController.php routes/web.php tests/Feature/DeleteRecordsTest.php database/migrations/2026_10_11_134043_drop_unique_names_on_parties_and_varieties.php)",
+      "PowerShell(node --check public/js/app.js)",
+      "PowerShell(php artisan test --compact 2>&1)",
+      "PowerShell(Get-Command chromium-cli, npx, node -ErrorAction SilentlyContinue)"
+    ]
+  }
+}
