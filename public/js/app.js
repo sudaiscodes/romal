@@ -569,7 +569,17 @@ function showBill(inv, partyName) {
   `;
     document.getElementById('previewBody').classList.add('wide', 'bill-modal');
     document.getElementById('previewBg').style.display = 'flex';
+    fitBill();
+    document.fonts.ready.then(fitBill);
 }
+// the bill always keeps its full-size layout and is scaled as a whole to fit inside the screen, never above 100%
+function fitBill() {
+    if (document.getElementById('previewBg').style.display !== 'flex') return;
+    const m = document.getElementById('previewBody');
+    m.style.zoom = 1;
+    m.style.zoom = Math.min(1, window.innerWidth * .94 / m.offsetWidth, window.innerHeight * .92 / m.offsetHeight);
+}
+window.addEventListener('resize', fitBill);
 function closePreview() { document.getElementById('previewBg').style.display = 'none'; }
 
 // ---------- LEDGER ----------
