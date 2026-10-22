@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\LedgerEntry;
@@ -109,7 +110,7 @@ class ApiController extends Controller
         $d = $r->validate($this->invoiceRules());
 
         return DB::transaction(function () use ($d) {
-            $no = (int) Invoice::withTrashed()->lockForUpdate()->max('invoice_no') + 1;
+            $no = (int) Invoice::lockForUpdate()->max('invoice_no') + 1;
             $inv = $this->saveInvoice(new Invoice(['invoice_no' => $no]), $d);
 
             return $this->invoiceJson($inv);
@@ -120,13 +121,20 @@ class ApiController extends Controller
     {
         $d = $r->validate($this->invoiceRules());
 
-        return DB::transaction(fn () => $this->invoiceJson($this->saveInvoice($invoice, $d)));
+        return DB::transaction(function () use ($r, $invoice, $d) {
+            $before = $this->invoiceSnapshot($invoice);
+            $inv = $this->saveInvoice($invoice, $d);
+            $this->logActivity($r, 'invoice', $inv->id, 'updated', $before, $this->invoiceSnapshot($inv));
+
+            return $this->invoiceJson($inv);
+        });
     }
 
-    // the invoice number is not reused: storeInvoice counts deleted invoices too
-    public function destroyInvoice(Invoice $invoice)
+    // storeInvoice numbers from the highest remaining invoice, so only deleting the latest frees its number
+    public function destroyInvoice(Request $r, Invoice $invoice)
     {
-        DB::transaction(function () use ($invoice) {
+        DB::transaction(function () use ($r, $invoice) {
+            $this->logActivity($r, 'invoice', $invoice->id, 'deleted', $this->invoiceSnapshot($invoice));
             $invoice->ledgerEntry()->delete();
             $invoice->delete();
         });
@@ -145,17 +153,66 @@ class ApiController extends Controller
     public function updatePayment(Request $r, LedgerEntry $entry)
     {
         abort_unless($entry->type === 'debit', 404);
-        $entry->update($r->validate($this->paymentRules()));
+        $d = $r->validate($this->paymentRules());
+
+        DB::transaction(function () use ($r, $entry, $d) {
+            $before = $this->paymentSnapshot($entry);
+            $entry->update($d);
+            $this->logActivity($r, 'payment', $entry->id, 'updated', $before, $this->paymentSnapshot($entry));
+        });
 
         return $this->entryJson($entry);
     }
 
-    public function destroyPayment(LedgerEntry $entry)
+    public function destroyPayment(Request $r, LedgerEntry $entry)
     {
         abort_unless($entry->type === 'debit', 404);
-        $entry->delete();
+
+        DB::transaction(function () use ($r, $entry) {
+            $this->logActivity($r, 'payment', $entry->id, 'deleted', $this->paymentSnapshot($entry));
+            $entry->delete();
+        });
 
         return response()->noContent();
+    }
+
+    // ---------- history ----------
+    // deleted records come from the soft-deleted rows themselves, so ones deleted before logging began still show
+    public function history()
+    {
+        $deleteLogs = ActivityLog::with('user')->where('action', 'deleted')->get()
+            ->keyBy(fn ($l) => $l->subject_type.':'.$l->subject_id);
+        $deletedBy = fn (string $type, int $id) => $deleteLogs->get($type.':'.$id)?->user?->name;
+
+        $invoices = Invoice::onlyTrashed()->get()->map(fn ($i) => [
+            'type' => 'invoice',
+            'id' => $i->id,
+            'deletedAt' => $i->deleted_at->format('Y-m-d H:i'),
+            'by' => $deletedBy('invoice', $i->id),
+            'record' => $this->invoiceSnapshot($i),
+        ]);
+
+        $payments = LedgerEntry::onlyTrashed()->where('type', 'debit')->get()->map(fn ($e) => [
+            'type' => 'payment',
+            'id' => $e->id,
+            'deletedAt' => $e->deleted_at->format('Y-m-d H:i'),
+            'by' => $deletedBy('payment', $e->id),
+            'record' => $this->paymentSnapshot($e),
+        ]);
+
+        $edits = ActivityLog::with('user')->where('action', 'updated')->latest('id')->get()->map(fn ($l) => [
+            'type' => $l->subject_type,
+            'id' => $l->subject_id,
+            'at' => $l->created_at->format('Y-m-d H:i'),
+            'by' => $l->user?->name,
+            'before' => $l->before,
+            'after' => $l->after,
+        ]);
+
+        return [
+            'deleted' => $invoices->concat($payments)->sortByDesc('deletedAt')->values(),
+            'edits' => $edits,
+        ];
     }
 
     // ---------- helpers ----------
@@ -234,6 +291,58 @@ class ApiController extends Controller
                 'price' => $it->price,
                 'total' => $it->total,
             ])->all(),
+        ];
+    }
+
+    // edits that change nothing are not logged
+    private function logActivity(Request $r, string $type, int $id, string $action, array $before, ?array $after = null): void
+    {
+        if ($before === $after) {
+            return;
+        }
+
+        ActivityLog::create([
+            'user_id' => $r->user()->id,
+            'subject_type' => $type,
+            'subject_id' => $id,
+            'action' => $action,
+            'before' => $before,
+            'after' => $after,
+        ]);
+    }
+
+    // names are copied in, so the history still reads right after a party or variety is renamed or deleted
+    private function invoiceSnapshot(Invoice $i): array
+    {
+        $i->load(['party' => fn ($q) => $q->withTrashed(), 'items.variety' => fn ($q) => $q->withTrashed()]);
+
+        return [
+            'no' => $i->invoice_no,
+            'date' => $i->date->format('Y-m-d'),
+            'party' => $i->party?->name,
+            'shipping' => $i->shipping_no ?? '',
+            'signedBy' => $i->signed_by ?? '',
+            'total' => $i->total,
+            'items' => $i->items->map(fn ($it) => [
+                'product' => $it->variety?->name,
+                'category' => $it->variety?->category,
+                'qty' => $it->qty,
+                'unit' => $it->unit,
+                'price' => $it->price,
+                'total' => $it->total,
+            ])->all(),
+        ];
+    }
+
+    private function paymentSnapshot(LedgerEntry $e): array
+    {
+        $e->load(['party' => fn ($q) => $q->withTrashed()]);
+
+        return [
+            'date' => $e->date->format('Y-m-d'),
+            'party' => $e->party?->name,
+            'method' => $e->method,
+            'amount' => $e->amount,
         ];
     }
 

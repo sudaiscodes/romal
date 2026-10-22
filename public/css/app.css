@@ -3339,3 +3339,23 @@ select {
         flex-wrap: wrap;
     }
 }
+
+/* History: old -> new values of an edit */
+.changes .chg {
+    font-size: 12.5px;
+    line-height: 1.9;
+}
+
+.changes .chg .k {
+    color: var(--ink-soft);
+}
+
+.changes .chg .old {
+    color: var(--clay);
+    text-decoration: line-through;
+}
+
+.changes .chg .new {
+    color: var(--teal);
+    font-weight: 600;
+}

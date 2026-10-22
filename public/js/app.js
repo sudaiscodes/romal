@@ -219,9 +219,10 @@ function goPage(key, n) { pageState[key] = n; RENDER[key](); }
 function onSearch(key) { pageState[key] = 1; RENDER[key](); }
 
 // ---------- views ----------
+const VIEWS = ['invoices', 'ledger', 'payments', 'parties', 'varieties', 'history'];
 function setView(v) {
     document.querySelectorAll('.nav .item[data-view]').forEach(el => el.classList.toggle('active', el.dataset.view === v));
-    ['invoices', 'ledger', 'payments', 'parties', 'varieties'].forEach(name => {
+    VIEWS.forEach(name => {
         document.getElementById('view-' + name).style.display = (name === v) ? 'block' : 'none';
     });
     if (v === 'ledger') renderLedgerView();
@@ -229,6 +230,7 @@ function setView(v) {
     if (v === 'payments') renderPaymentsView();
     if (v === 'parties') renderPartiesList();
     if (v === 'varieties') renderVarietiesList();
+    if (v === 'history') renderHistoryView();
     Object.keys(FLOWS).forEach(key => showFlow(key, 'cta'));
 }
 
@@ -536,6 +538,10 @@ document.getElementById('fBrand').innerHTML = BILL_BRAND;
 function preview(id) {
     const inv = invoices.find(i => String(i.id) === String(id));
     const p = party(inv.partyId);
+    showBill(inv, p ? p.name : '');
+}
+// also used for deleted bills in History, whose snapshot carries the party name instead of a partyId
+function showBill(inv, partyName) {
     const MIN_ROWS = 10;
     const rows = inv.items.map((i, n) => `<tr>
       <td class="b-sn"><span dir="ltr">${n + 1}</span></td>
@@ -550,7 +556,7 @@ function preview(id) {
       <div class="bp-meta">
         <div class="bm-cell bm-no"><span class="bm-lbl">نمبر</span><span class="bm-val bm-num" dir="ltr">${pad3(invNo(inv))}</span></div>
         <div class="bm-cell bm-side"><span class="bm-lbl">تاریخ</span><span class="bm-val" dir="ltr">${fmtDate(inv.date).replace(/\//g, '-')}</span></div>
-        <div class="bm-cell bm-name"><span class="bm-lbl">بل بنام</span><span class="bm-val">${p ? nameHtml(p.name) : ''}</span></div>
+        <div class="bm-cell bm-name"><span class="bm-lbl">بل بنام</span><span class="bm-val">${nameHtml(partyName)}</span></div>
         <div class="bm-cell bm-side"><span class="bm-lbl">بلٹی نمبر</span><span class="bm-val" dir="ltr">${esc(inv.shipping || '')}</span></div>
       </div>
       <table class="bp-tbl">
@@ -778,6 +784,59 @@ function renderVarietiesList() {
 }
 RENDER.varieties = renderVarietiesList;
 
+// ---------- HISTORY ----------
+// read-only: deleted bills/payments and a before/after log of edits, fetched each time the view opens
+let historyData = { deleted: [], edits: [] };
+async function renderHistoryView() {
+    const err = document.getElementById('historyErr');
+    err.style.display = 'none';
+    try { historyData = await api('GET', '/api/history'); }
+    catch (e) { showFormError(err, e.message); return; }
+    pageState.historyDeleted = 1; pageState.historyEdits = 1;
+    renderDeleted();
+    renderEdits();
+}
+function fmtDateTime(s) { const [d, tm] = String(s || '').split(' '); return `${fmtDate(d)} <span class="sm-text" dir="ltr">${esc(tm || '')}</span>`; }
+function whoWhen(at, by) { return `<span class="nw">${fmtDateTime(at)}</span>${by ? `<div class="sm-text">${nameHtml(by)}</div>` : ''}`; }
+function typeTag(type) {
+    return type === 'invoice' ? '<span class="tag inv"><svg><use href="#i-invoice"/></svg>بل</span>' : '<span class="tag pay"><svg><use href="#i-cash"/></svg>ادائیگی</span>';
+}
+function recordLabel(type, r) { return type === 'invoice' ? `<span class="inv-no">بل نمبر ${pad3(r.no)}</span>` : `<span class="tag m-${esc(r.method)}">${esc(UR[r.method] || r.method)}</span>`; }
+function renderDeleted() {
+    const all = historyData.deleted;
+    document.getElementById('deletedCount').textContent = all.length ? `کل ${all.length}` : '';
+    const rows = paginate('historyDeleted', all);
+    const off = (pageState.historyDeleted - 1) * PAGE_SIZE;
+    document.getElementById('deletedRows').innerHTML = rows.map((d, ri) => {
+        const r = d.record, isInv = d.type === 'invoice';
+        return `<tr><td class="rn"><span class="sn">${off + ri + 1}</span></td><td>${typeTag(d.type)}</td><td class="nw">${recordLabel(d.type, r)}</td>
+    <td class="pname">${nameHtml(r.party || '-')}</td><td class="nw">${fmtDate(r.date)}</td><td class="num">${fmt(isInv ? r.total : r.amount)}</td><td>${whoWhen(d.deletedAt, d.by)}</td>
+    <td class="act">${isInv ? `<button class="icon-btn" title="بل دیکھیں" aria-label="بل دیکھیں" onclick="showBill(historyData.deleted[${off + ri}].record, historyData.deleted[${off + ri}].record.party)"><svg><use href="#i-eye"/></svg></button>` : ''}</td></tr>`;
+    }).join('') || `<tr><td colspan="8" class="empty">ابھی کوئی حذف شدہ بل یا ادائیگی نہیں۔</td></tr>`;
+}
+RENDER.historyDeleted = renderDeleted;
+function itemsText(items) { return (items || []).map(i => `${i.product} ${i.qty} ${unitName(i.unit)} × ${fmt(i.price)}`).join('، '); }
+// [label, value as shown] for each field that can be edited, compared before vs after
+const HISTORY_FIELDS = {
+    invoice: [['تاریخ', r => fmtDate(r.date)], ['پارٹی', r => r.party || '-'], ['بلٹی نمبر', r => r.shipping || '-'], ['دستخط', r => r.signedBy || '-'], ['آئٹمز', r => itemsText(r.items)], ['کل رقم', r => fmt(r.total)]],
+    payment: [['تاریخ', r => fmtDate(r.date)], ['پارٹی', r => r.party || '-'], ['ادائیگی کی قسم', r => UR[r.method] || r.method], ['رقم', r => fmt(r.amount)]]
+};
+function changesHtml(type, before, after) {
+    return HISTORY_FIELDS[type].map(([label, show]) => [label, show(before), show(after)]).filter(([, a, b]) => a !== b)
+        .map(([label, a, b]) => `<div class="chg"><span class="k">${label}:</span> <bdi class="old">${esc(a)}</bdi> ← <bdi class="new">${esc(b)}</bdi></div>`).join('');
+}
+function renderEdits() {
+    const all = historyData.edits;
+    document.getElementById('editsCount').textContent = all.length ? `کل ${all.length}` : '';
+    const rows = paginate('historyEdits', all);
+    const off = (pageState.historyEdits - 1) * PAGE_SIZE;
+    document.getElementById('editRows').innerHTML = rows.map((e, ri) =>
+        `<tr><td class="rn"><span class="sn">${off + ri + 1}</span></td><td>${whoWhen(e.at, e.by)}</td><td>${typeTag(e.type)}</td>
+    <td class="nw">${recordLabel(e.type, e.after)}${e.type === 'payment' ? `<div class="sm-text">${nameHtml(e.after.party || '')}</div>` : ''}</td><td class="changes">${changesHtml(e.type, e.before, e.after)}</td></tr>`
+    ).join('') || `<tr><td colspan="5" class="empty">ابھی کوئی ترمیم نہیں۔ ترامیم آج سے ریکارڈ ہو رہی ہیں۔</td></tr>`;
+}
+RENDER.historyEdits = renderEdits;
+
 // ---------- EDITING ----------
 let editCtx = null;
 function showEdit(kind, title, sub) {
@@ -920,7 +979,7 @@ function deleteInvoice(id) {
     const p = party(inv.partyId);
     confirmDelete({
         title: `کیا آپ واقعی بل ${pad3(invNo(inv))} حذف کرنا چاہتے ہیں؟`,
-        text: `${p ? p.name + '، ' : ''}${fmtDate(inv.date)}، کل رقم ${fmt(inv.total)}۔ یہ بل پارٹی کے کھاتے سے بھی نکل جائے گا۔ اس کا نمبر دوبارہ استعمال نہیں ہوگا۔`,
+        text: `${p ? p.name + '، ' : ''}${fmtDate(inv.date)}، کل رقم ${fmt(inv.total)}۔ یہ بل پارٹی کے کھاتے سے بھی نکل جائے گا۔`,
         action: () => api('DELETE', '/api/invoices/' + inv.id)
     });
 }
@@ -1015,7 +1074,7 @@ new MutationObserver(muts => {
 }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: TR_ATTRS });
 translateTree(document.body);
 
-function currentView() { return ['invoices', 'ledger', 'payments', 'parties', 'varieties'].find(n => document.getElementById('view-' + n).style.display !== 'none'); }
+function currentView() { return VIEWS.find(n => document.getElementById('view-' + n).style.display !== 'none'); }
 
 (async function init() {
     try { await loadAll(); } catch (e) { alert('Could not load data: ' + e.message); }

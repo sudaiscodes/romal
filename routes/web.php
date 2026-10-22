@@ -42,5 +42,6 @@ Route::middleware('auth')->group(function () {
         Route::post('payments', 'storePayment');
         Route::put('payments/{entry}', 'updatePayment');
         Route::delete('payments/{entry}', 'destroyPayment');
+        Route::get('history', 'history');
     });
 });

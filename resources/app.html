@@ -77,6 +77,11 @@
             <path d="M2.5 4h11M6.2 4V2.5h3.6V4M4 4l.7 9.5h6.6L12 4M6.6 6.5v4.5M9.4 6.5v4.5" fill="none"
                 stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
         </symbol>
+        <symbol id="i-clock" viewBox="0 0 16 16">
+            <circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.4" />
+            <path d="M8 4.6V8l2.4 1.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </symbol>
         <symbol id="i-sort" viewBox="0 0 16 16">
             <path d="M5 2v12M5 14l-3-3M5 14l3-3M11 14V2M11 2L8 5M11 2l3 3" fill="none" stroke="currentColor"
                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -100,6 +105,9 @@
             <div class="item" data-view="varieties"><svg class="ico" aria-hidden="true">
                     <use href="#i-tag" />
                 </svg><span>Varieties</span></div>
+            <div class="item" data-view="history"><svg class="ico" aria-hidden="true">
+                    <use href="#i-clock" />
+                </svg><span>History</span></div>
             <div class="profile" id="profile">
                 <button type="button" class="item profile-btn" id="profileBtn" onclick="toggleProfile()"
                     aria-expanded="false" aria-controls="profileCard"><span class="avatar"
@@ -644,6 +652,60 @@
                         </table>
                     </div>
                     <div class="pager" id="pager-varieties"></div>
+                </div>
+            </div>
+
+            <!-- HISTORY -->
+            <div id="view-history" class="urdu" dir="rtl" lang="ur" style="display:none">
+                <div class="top">
+                    <div>
+                        <h2>ریکارڈ</h2>
+                        <p>حذف شدہ اور ترمیم شدہ بل اور ادائیگیاں۔ یہ ریکارڈ صرف دیکھنے کے لیے ہے۔</p>
+                    </div>
+                </div>
+                <div class="err" id="historyErr"></div>
+                <div class="panel">
+                    <div class="panel-head">
+                        <h3>حذف شدہ <span class="count" id="deletedCount"></span></h3>
+                    </div>
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="rn">#</th>
+                                    <th>قسم</th>
+                                    <th>تفصیل</th>
+                                    <th>پارٹی</th>
+                                    <th>تاریخ</th>
+                                    <th class="num">رقم</th>
+                                    <th>کب حذف ہوا</th>
+                                    <th class="act"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="deletedRows"></tbody>
+                        </table>
+                    </div>
+                    <div class="pager" id="pager-historyDeleted"></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head">
+                        <h3>ترامیم <span class="count" id="editsCount"></span></h3>
+                    </div>
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="rn">#</th>
+                                    <th>کب</th>
+                                    <th>قسم</th>
+                                    <th>ریکارڈ</th>
+                                    <th>تبدیلیاں</th>
+                                </tr>
+                            </thead>
+                            <tbody id="editRows"></tbody>
+                        </table>
+                    </div>
+                    <div class="pager" id="pager-historyEdits"></div>
                 </div>
             </div>
         </div>

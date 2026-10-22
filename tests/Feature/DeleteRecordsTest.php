@@ -54,12 +54,23 @@ class DeleteRecordsTest extends TestCase
         $this->getJson('/api/bootstrap')->assertJsonCount(0, 'invoices')->assertJsonCount(0, 'parties.0.entries');
     }
 
-    public function test_invoice_numbers_are_not_reused_after_a_delete(): void
+    public function test_deleting_the_latest_invoice_reuses_its_number(): void
+    {
+        $this->createInvoice();
+        $latest = $this->createInvoice();
+        $this->deleteJson("/api/invoices/{$latest['id']}")->assertNoContent();
+
+        $this->assertSame($latest['no'], $this->createInvoice()['no']);
+    }
+
+    public function test_deleting_an_earlier_invoice_does_not_change_numbering(): void
     {
         $first = $this->createInvoice();
+        $second = $this->createInvoice();
         $this->deleteJson("/api/invoices/{$first['id']}")->assertNoContent();
 
-        $this->assertSame($first['no'] + 1, $this->createInvoice()['no']);
+        $this->assertSame($second['no'] + 1, $this->createInvoice()['no']);
+        $this->getJson('/api/bootstrap')->assertJsonPath('invoices.0.no', $second['no']);
     }
 
     public function test_deleting_a_payment_removes_it_from_the_ledger(): void
