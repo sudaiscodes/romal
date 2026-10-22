@@ -21,6 +21,11 @@ Route::middleware('auth')->group(function () {
         $html = file_get_contents(resource_path('app.html'));
         $meta = '<meta name="csrf-token" content="'.csrf_token().'">';
 
+        // version the assets by modified time, so browsers fetch them again after a deploy
+        foreach (['/css/app.css', '/js/app.js'] as $asset) {
+            $html = str_replace('"'.$asset.'"', '"'.$asset.'?v='.filemtime(public_path($asset)).'"', $html);
+        }
+
         return response(str_replace('</head>', $meta.'</head>', $html))
             ->header('Cache-Control', 'no-cache, no-store, must-revalidate, private')
             ->header('Pragma', 'no-cache')
